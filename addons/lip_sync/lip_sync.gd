@@ -1,4 +1,4 @@
-extends Control
+extends MarginContainer
 class_name LipSync
 
 enum Vowel {
@@ -43,6 +43,7 @@ const SAMPLE_INTERVAL = 0.1
 var last_time_updated = 0
 
 var precision_threshold = 0.7
+@export var stream: AudioStream
 
 signal vowel_estimated
 
@@ -108,7 +109,7 @@ static func read_16bit_samples(stream: AudioStreamWAV) -> Array:
 	var channel_count = 2 if stream.is_stereo() else 1
 	
 	var bytes = stream.data
-	var samples = []
+	var samples: Array[float] = []
 	var i = 0
 	# Read by packs of 2 bytes
 	while (i + 1) < len(bytes):
@@ -300,13 +301,14 @@ func push_estimate(vowel: int) -> void:
 func _ready():
 	var idx: int = AudioServer.get_bus_index("Record")
 	effect = AudioServer.get_bus_effect(idx, 0)
+	$AudioStreamWav.stream = stream
 
 
 func _process(delta):
 	$VBoxContainer/Fps.text = "FPS: %d" % Engine.get_frames_per_second()
 	
 	if is_recording:
-		if buffer <= 0:
+		if buffer <= 0 and effect:
 			if effect.is_recording_active():
 				effect.set_recording_active(false)
 				audio_sample = effect.get_recording()

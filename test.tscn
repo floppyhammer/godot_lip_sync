@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dud0bpdui5fm8"]
+[gd_scene load_steps=4 format=3 uid="uid://dud0bpdui5fm8"]
 
 [ext_resource type="Script" path="res://test.gd" id="1_abymy"]
 [ext_resource type="PackedScene" uid="uid://bua4tr0ep7amc" path="res://addons/lip_sync/lip_sync.tscn" id="1_kdtp3"]
+[ext_resource type="AudioStream" uid="uid://ds4gy6lu66uuk" path="res://assets/test_speech.wav" id="3_oamei"]
 
 [node name="Test" type="Control"]
 layout_mode = 3
@@ -16,5 +17,6 @@ script = ExtResource("1_abymy")
 layout_mode = 1
 offset_top = -134.0
 offset_bottom = 134.0
+stream = ExtResource("3_oamei")
 
 [connection signal="vowel_estimated" from="LipSync" to="." method="_on_lip_sync_vowel_estimated"]
