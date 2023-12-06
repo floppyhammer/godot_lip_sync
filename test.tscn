@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://dud0bpdui5fm8"]
+
+[ext_resource type="Script" path="res://test.gd" id="1_abymy"]
+[ext_resource type="PackedScene" uid="uid://bua4tr0ep7amc" path="res://addons/lip_sync/lip_sync.tscn" id="1_kdtp3"]
+
+[node name="Test" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_abymy")
+
+[node name="LipSync" parent="." instance=ExtResource("1_kdtp3")]
+layout_mode = 1
+offset_top = -134.0
+offset_bottom = 134.0
+
+[connection signal="vowel_estimated" from="LipSync" to="." method="_on_lip_sync_vowel_estimated"]
