@@ -106,5 +106,5 @@ static func filter(sample_array: Array[float], lowcut: int, highcut: int):
 		minimum == 0.000001
 		
 	for i in range(sample_array.size()):
-		if i <= lowcut || i >= highcut:
+		if sample_array[i] <= lowcut || sample_array[i] >= highcut:
 			sample_array[i] = minimum
