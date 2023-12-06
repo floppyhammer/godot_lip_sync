@@ -29,7 +29,7 @@ static func array_normalize(sample_array: Array[float]):
 		vmin = min(vmin, sample_array[i])
 	
 	var diff: float = vmax - vmin
-	var d: float = 1.0 / diff if diff != 0 else 1.0
+	var d: float = 1.0 / diff if diff != 0.0 else 1.0
 	
 	for i in range(n):
 		sample_array[i] = (sample_array[i] - vmin) * d

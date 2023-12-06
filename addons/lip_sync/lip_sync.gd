@@ -9,6 +9,8 @@ enum Vowel {
 	O
 }
 
+const VOWELS: Array = ["A", "I", "U", "E", "O"]
+
 # Getting the recording stream again at a rate of 4 frames or less caused error.
 const UPDATE_FRAME: int = 5
 # Needs 2^n.
@@ -129,13 +131,11 @@ static func read_16bit_samples(stream: AudioStreamWAV) -> Array:
 # functions for Lip Sync #
 ##########################
 
-# get peaks
-func get_peaks(sample_array: Array, threshold: float) -> Array:
+func get_peaks(sample_array: Array[float], threshold: float) -> Array[Vector2]:
 	var n: int = sample_array.size() - 1
 	var i: int = 1
-	var j: int = 0
 	var tmp: Vector2 = Vector2.ZERO
-	var out: Array = []
+	var out: Array[Vector2] = []
 	var div: float = 1.0
 	while i < n:
 		if (
@@ -151,8 +151,7 @@ func get_peaks(sample_array: Array, threshold: float) -> Array:
 		i += 1
 	return out
 
-# get peaks average
-func get_peaks_average(size: int) -> Array:
+func get_peaks_average(size: int) -> Array[Vector2]:
 	var out: Array = []
 	var i: int = 1
 	var j: int = 0
@@ -184,14 +183,12 @@ func get_peaks_average(size: int) -> Array:
 		
 	return out
 
-# Get distance from vowel DB.
-func get_distance_from_db(peaks: Array) -> Array:
-	var out: Array = []
-	
-	var vowel: Array = ["A", "I", "U", "E", "O"]
-	var peak_estm: Dictionary = {}
+func get_distance_from_db(peaks: Array[Vector2]) -> Array[float]:
+	var out: Array[float] = []
 	
 	var dist: float = 0.0
+	
+	var peak_estm: Dictionary = {}
 	
 	match(peaks.size()):
 		3:
@@ -200,11 +197,11 @@ func get_distance_from_db(peaks: Array) -> Array:
 			peak_estm = Model.ESTIMATE_DB["peak4"]
 		_:
 			return out
-			
-	for i in range(vowel.size()):
+	
+	for v in VOWELS:
 		dist = 0.0
 		for j in range(peaks.size()):
-			var est = peak_estm[vowel[i]][j]
+			var est = peak_estm[v][j]
 			dist += abs(est.x - peaks[j].x) * INV_255 + abs(est.y - peaks[j].y)
 		out.append(dist)
 		
@@ -349,7 +346,7 @@ func _execute(sample_array: Array[float]):
 		print("Audio data size is too small, skipped!")
 		return
 		
-	sample_array = sample_array.slice(0, FFT_SAMPLES - 1)
+	sample_array = sample_array.slice(0, FFT_SAMPLES)
 	
 	# Hamming
 	Algorithm.hamming(sample_array)
@@ -357,7 +354,7 @@ func _execute(sample_array: Array[float]):
 	# To spectrum by FFT
 	Algorithm.rfft(sample_array, false, true)
 	
-	sample_array = sample_array.slice(0, FFT_SAMPLES * 0.5)
+	sample_array = sample_array.slice(0, int(FFT_SAMPLES * 0.5) + 1)
 	
 	# Smoothing
 	if !before_sample_array.is_empty():
@@ -383,7 +380,7 @@ func _execute(sample_array: Array[float]):
 	# To spectrum by FFT again
 	Algorithm.rfft(sample_array, false, false)
 	
-	sample_array = sample_array.slice(0, FFT_SAMPLES * 0.25)
+	sample_array = sample_array.slice(0, int(FFT_SAMPLES * 0.25) + 1)
 	
 	# Normalize.
 	Algorithm.array_normalize(sample_array)
